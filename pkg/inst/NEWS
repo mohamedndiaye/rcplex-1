@@ -1,0 +1,4 @@
+0.1-4: Added option to enforce rounding of integer variables in MIPs.
+0.1-3: Added support for Microsoft 
+0.1-2: Added simple_triplet_matrix class from relations package to support sparse Matrices
+0.1-1: First version: support for linear and quadratic, continuous and mixed-integer programs. Only Linux supported.

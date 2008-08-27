@@ -1,0 +1,2 @@
+PKG_CPPFLAGS=-I/c/ilog/cplex111/include
+PKG_LIBS=-L/c/ilog/cplex111/lib/x86_windows_vs2008/stat_mda -lcplex111 -lm
