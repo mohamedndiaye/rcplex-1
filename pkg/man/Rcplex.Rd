@@ -20,7 +20,7 @@
 \usage{
 Rcplex(cvec, Amat, bvec, Qmat = NULL,
        lb = 0, ub = Inf, control = list(),
-       objsense = c("min", "max"), sense = "L", vtype = NULL)
+       objsense = c("min", "max"), sense = "L", vtype = NULL, n = 1)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -49,12 +49,20 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
     \code{length(vtype)==1} the same value is taken for all
     variables. Otherwise, requires
     \code{length(vtype)==length(ctype)}. Default \code{"C"}.}
+  \item{n}{ Determines the maximal number of solutions the solver should
+    return in case of an MIP with more than one solution at
+    optimum. If CPLEX should search for "all" solutions then
+    \code{n} has to be set to \code{NA}. In CPLEX this is also called
+    populating the solution pool. The parameters \code{solnpoolagap},
+    \code{solnpoolgap}, and \code{solnpoolintensity} influence the
+    search for multiple solutions (see also the \code{control}
+    argument below for details). Default \code{1}.} 
 }
 \details{
   Matrices \code{A} and \code{C} may be sparse matrices from a class in
   the hierarchy defined by the \code{Matrix} package. In that case, the
   internal casting functions are used to create the proper data
-  structures to pass to Cplex, which is similar to the column-major
+  structures to pass to CPLEX, which is similar to the column-major
   storage mode defined by the \code{dgCMatrix-class} defined by the
   \code{Matrix} package.
 
@@ -89,6 +97,8 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
     \item{itlim:}{Maximum number of simplex iterations. Can be any
       nonnegative number. Default 1e8.}
     \item{epagap:}{Absolute MIP optimality gap tolerance. Can be any
+      nonnegative number. Default 1e-6.}
+    \item{epgap:}{Relative MIP optimality gap tolerance. Can be any
       nonnegative number. Default 1e-4.}
     \item{tilim:}{Time limit in seconds of call to optimizer. Can be any
       nonnegative number. Default 1e75.}
@@ -106,6 +116,15 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
       -1:4. Default 0 (choose best method automatically).}
     \item{flowcovers:}{Indicator for flowcover cuts in MIP solver. Must
       be in -1:2. Default 0 (automatic).}
+    \item{solnpoolagap:}{Sets an absolute tolerance on the objective
+      value for the solutions in the solution pool. Can be any
+      nonnegative real number. Default 0}
+    \item{solnpoolgap:}{Sets a relative tolerance on the objective
+      value for the solutions in the solution pool. Can be any
+      nonnegative real number. Default 0}
+    \item{solnpoolintensity:}{Controls the trade-off between the number
+      of solutions generated for the solution pool and the amount of
+      time and memory consumed. Must be in 0:4. Default 0 (automatic).}
     \item{round:}{Flag indicating if integer solutions for MIPs should be
       rounded before returning. In some cases, CPLEX returns slightly
       infeasible integer solutions. Setting this option to 1 ensures
@@ -114,14 +133,18 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
 }
 \value{
   Returns a list with the following components:
-  \item{xopt }{Values of problem variables at optimum}
-  \item{obj }{Value of objective function at optimum}
+  \item{xopt }{Values of problem variables at optimum. In case of
+    multiple solutions: a list containing for each solution the vector of
+    optimal values.}
+  \item{obj }{Value of objective function at optimum. In case of
+    multiple solutions: a list containing for each solution the objective
+    function at optimum.}
   \item{status}{Solution status. 1 means successful completion. Check
-    CPLEX documentation for status codes}
+    CPLEX documentation for status codes.}
   \item{extra}{List with extra information about solution with components
     \describe{
       \item{slack:}{Values of slack variables for inequality
-	constraints}
+	constraints or a list of slack variables in case of multiple solutions.}
       \item{nodecnt:}{(IF MIP PROBLEM) Number of nodes in the search tree evaluated}
       \item{lambda:}{(IF NOT MIP PROBLEM) Values of dual variables at optimum}
     }
