@@ -151,7 +151,6 @@ SEXP Rcplex(SEXP numcols_p,
   }
   
   PROTECT(solstat = allocVector(INTSXP,  1));
-  PROTECT(extra   = allocVector(VECSXP,  2));
 
   /* retrieve status of optimization */
   *INTEGER(solstat) = CPXgetstat(env, lp);
@@ -166,40 +165,53 @@ SEXP Rcplex(SEXP numcols_p,
 
     num_sol = CPXgetsolnpoolnumsolns(env, lp);
     
-    /* if the 'n' parameter is set in R we return a list with
-       the number of solutions */
+    /* if the 'n' parameter is set in R we always return a list with
+       a number of elements equal to the number of solutions */
     if(INTEGER(num_poplim)[0] > 1){
       /* MIP optimization results -> more than 1 solution */
-      PROTECT(obj   = allocVector(VECSXP, num_sol));
-      PROTECT(xopt  = allocVector(VECSXP, num_sol));
-      PROTECT(slack = allocVector(VECSXP, num_sol));
+      PROTECT(res = allocVector(VECSXP, num_sol));
 
-      /* now retrieve all the different solutions */
+      /* now retrieve multiple solutions if any */
       for( i = 0; i < num_sol; i++){
+	PROTECT(tmp  = allocVector(VECSXP, 4));
+    	PROTECT(xopt = allocVector(REALSXP,  cur_numcols));
+    	status = CPXgetsolnpoolx(env, lp, i, REAL(xopt), 0, cur_numcols - 1);
+    	
+	SET_VECTOR_ELT(tmp, 0, xopt);
 
-	PROTECT(tmp  = allocVector(REALSXP, 1));
-	status = CPXgetsolnpoolobjval(env, lp, i, REAL(tmp));
+	PROTECT(obj   = allocVector(REALSXP, 1));
+	status = CPXgetsolnpoolobjval(env, lp, i, REAL(obj));
 	/* if no integer solution exists, return NA */
 	if (status) {
-	  *REAL(tmp) = NA_REAL;
+	  *REAL(obj) = NA_REAL;
 	}
-	SET_VECTOR_ELT(obj, i, tmp);
+	SET_VECTOR_ELT(tmp, 1, obj);
+	
+	/* extra info */
+    	PROTECT(slack  = allocVector(REALSXP,  cur_numrows));
+    	status = CPXgetmipslack(env, lp, REAL(slack), 0, cur_numrows - 1);
+    	PROTECT(nodecnt = allocVector(INTSXP, 1));
+	*INTEGER(nodecnt) = CPXgetnodecnt(env, lp);
 
-    	PROTECT(tmp  = allocVector(REALSXP,  cur_numcols));
-    	status = CPXgetsolnpoolx(env, lp, i, REAL(tmp), 0, cur_numcols - 1);
-    	SET_VECTOR_ELT(xopt, i, tmp);
+	SET_VECTOR_ELT(tmp, 2, solstat); 
 
-    	PROTECT(tmp  = allocVector(REALSXP,  cur_numrows));
-    	status = CPXgetmipslack(env, lp, REAL(tmp), 0, cur_numrows - 1);
-    	SET_VECTOR_ELT(slack, i, tmp);
+	PROTECT(extra   = allocVector(VECSXP,  2));
+	SET_VECTOR_ELT(extra, 0, nodecnt);
+	SET_VECTOR_ELT(extra, 1, slack);
+	SET_VECTOR_ELT(tmp, 3, extra);
+	
+	/* add solution to return vector */
+	SET_VECTOR_ELT(res, i, tmp);
 
-    	UNPROTECT(3);
-      }
-    }
+    	UNPROTECT(6);
+      } /* END FOR */
+    } /* END multiple solutions */
     else {
       /* MIP optimization 1 solution */
+      PROTECT(res   = allocVector(VECSXP,  4));
       PROTECT(obj   = allocVector(REALSXP, 1));
       PROTECT(xopt  = allocVector(REALSXP, numcols));
+      PROTECT(extra = allocVector(VECSXP,  2));
       PROTECT(slack = allocVector(REALSXP, numrows));
 
       status = CPXgetmipobjval(env, lp, REAL(obj));
@@ -219,19 +231,28 @@ SEXP Rcplex(SEXP numcols_p,
 	for(i = 0; i < cur_numrows; i++)
 	  REAL(slack)[i] = NA_REAL;
       }
-    }
 
-    /* Provide some little extra information */
-    PROTECT(nodecnt = allocVector(INTSXP, 1));
-    *INTEGER(nodecnt) = CPXgetnodecnt(env, lp);
-    SET_VECTOR_ELT(extra, 0, nodecnt);
-    SET_VECTOR_ELT(extra, 1, slack);
-  }
+      /* Provide some little extra information */
+      PROTECT(nodecnt = allocVector(INTSXP, 1));
+      *INTEGER(nodecnt) = CPXgetnodecnt(env, lp);
+      SET_VECTOR_ELT(extra, 0, nodecnt);
+      SET_VECTOR_ELT(extra, 1, slack);
+    
+      /* Create return vector for MIP 1 solution*/
+      SET_VECTOR_ELT(res, 0, xopt); 
+      SET_VECTOR_ELT(res, 1, obj); 
+      SET_VECTOR_ELT(res, 2, solstat); 
+      SET_VECTOR_ELT(res, 3, extra);
+      
+      UNPROTECT(5);
+    } /* END MIP optimization 1 solution */
+  } /* END MIP optimization */
   else {
     /* continuous optimization */
     PROTECT(obj   = allocVector(REALSXP, 1));
-    PROTECT(xopt    = allocVector(REALSXP, numcols));
-    PROTECT(slack   = allocVector(REALSXP, numrows));
+    PROTECT(xopt  = allocVector(REALSXP, numcols));
+    PROTECT(extra = allocVector(VECSXP,  2));
+    PROTECT(slack = allocVector(REALSXP, numrows));
 
     status = CPXgetobjval(env, lp, REAL(obj));
     if (status) {
@@ -261,15 +282,19 @@ SEXP Rcplex(SEXP numcols_p,
     }
     SET_VECTOR_ELT(extra, 0, lambda);
     SET_VECTOR_ELT(extra, 1, slack);
+
+    /* Create return vector for continuous solution */
+    PROTECT(res = allocVector(VECSXP,4));
+    SET_VECTOR_ELT(res, 0, xopt); 
+    SET_VECTOR_ELT(res, 1, obj); 
+    SET_VECTOR_ELT(res, 2, solstat); 
+    SET_VECTOR_ELT(res, 3, extra);
+    
+    UNPROTECT(5);
   } /* END IF continuous optimization */
   
-  /* Create return vector */
-  PROTECT(res = allocVector(VECSXP,4));
-  SET_VECTOR_ELT(res, 0, xopt); 
-  SET_VECTOR_ELT(res, 1, obj); 
-  SET_VECTOR_ELT(res, 2, solstat); 
-  SET_VECTOR_ELT(res, 3, extra);
-  UNPROTECT(7);
+
+  UNPROTECT(2); /* unprotect return-vector res and solstat */
   
   /* Reset all CPLEX parameters to default values */
   status = CPXsetdefaults(env);

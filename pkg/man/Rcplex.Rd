@@ -132,19 +132,17 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
   }
 }
 \value{
-  Returns a list with the following components:
-  \item{xopt }{Values of problem variables at optimum. In case of
-    multiple solutions: a list containing for each solution the vector of
-    optimal values.}
-  \item{obj }{Value of objective function at optimum. In case of
-    multiple solutions: a list containing for each solution the objective
-    function at optimum.}
+  Returns a list with the following components, or, if \code{n > 1} a list
+  of length equal to the number of optimal solutions containing the
+  following components for each solution:
+  \item{xopt}{Values of problem variables at optimum.}
+  \item{obj }{Value of objective function at optimum.}
   \item{status}{Solution status. 1 means successful completion. Check
     CPLEX documentation for status codes.}
   \item{extra}{List with extra information about solution with components
     \describe{
       \item{slack:}{Values of slack variables for inequality
-	constraints or a list of slack variables in case of multiple solutions.}
+	constraints.}
       \item{nodecnt:}{(IF MIP PROBLEM) Number of nodes in the search tree evaluated}
       \item{lambda:}{(IF NOT MIP PROBLEM) Values of dual variables at optimum}
     }

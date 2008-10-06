@@ -102,20 +102,26 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
                  control$C,
                  as.integer(control$R$maxcalls))
 
-    names(res) <- c("xopt", "obj", "status", "extra")
-
     if (isMIP) {
-      names(res$extra) <- c("nodecnt", "slack")
-      if (control$R$round) {
-        intvars <- which(vtype != 'C')
-        intround <- function(x) { x[ intvars ] <- round(x[ intvars ]); x }
-        res$xopt <- if(is.list(res$xopt))
-          lapply(res$xopt, intround)
-        else
+      intround <- function(x) { x[ intvars ] <- round(x[ intvars ]); x }
+      intvars <- which(vtype != 'C')
+      if (n > 1) {
+        res <- lapply(res, function(x) { names(x) <- c("xopt", "obj", "status", "extra")
+                                         names(x$extra) <- c("nodecnt", "slack")
+                                         x })
+        if (control$R$round)
+          res <- lapply(res, function(x) {x$xopt <- intround(x$xopt)
+                                          x})
+      }
+      else {
+        names(res) <- c("xopt", "obj", "status", "extra")
+        names(res$extra) <- c("nodecnt", "slack")
+        if (control$R$round)
           intround(res$xopt)
       }
     }
     else {
+      names(res) <- c("xopt", "obj", "status", "extra")
       names(res$extra) <- c("lambda", "slack")
     }
     return(res)
