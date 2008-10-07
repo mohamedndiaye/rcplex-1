@@ -128,7 +128,7 @@ SEXP Rcplex(SEXP numcols_p,
        3. the 'limit on number of solutions generated' for solution
           pool CPX_PARAM_POPULATELIM */
       status = CPXsetintparam(env, CPX_PARAM_POPULATELIM, 
-			      INTEGER(num_poplim)[0]);
+			      INTEGER(num_poplim)[0] - 1);
       if (status) {
 	my_error(("Failed to set 'populate limit' parameter.\n"));
       }

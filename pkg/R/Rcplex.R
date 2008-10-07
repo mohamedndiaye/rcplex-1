@@ -69,9 +69,11 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
     ## check number of solutions
     n <- as.integer(n)
     ## if NA then find all solutions (at most max. integer solutions)
+    ## as Rcplex has troubles with .Machine$integer.max
+    ## we take the value from the User's manual
     if(is.na(n))
-      n <- .Machine$integer.max
-
+      n <- 2.1e+9L
+    
     ## coerce Amat and Qmat to CPX matrices
     Acpx <- toCPXMatrix(Amat)
     Qcpx <- toCPXMatrix(Qmat)
