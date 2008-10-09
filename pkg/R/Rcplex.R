@@ -119,7 +119,7 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
         names(res) <- c("xopt", "obj", "status", "extra")
         names(res$extra) <- c("nodecnt", "slack")
         if (control$R$round)
-          intround(res$xopt)
+          res$xopt <- intround(res$xopt)
       }
     }
     else {
