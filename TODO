@@ -1,0 +1,16 @@
+* status codes
+Several status codes indicate a success of the optimization process
+
+1 ... Simplex/Barrier optimal
+101 ... MIP optimal (when n = 1)
+128 ... optimal populated (n > 1, all possible solutions have been
+   found, may be solutions that are "not optimal" in the sense of
+   maximum/minimum - e.g. gap -> Inf) 
+129 ... optimal populated tol. (all possible solutions within a
+   specified tolerance/gap) 
+130 ... optimal populate lim. (n possible solutions, maybe there are
+   more than these) 
+
+Is it probably better to return 0 if one of the above status codes are
+   encountered and the status code otherwise? Nevertheless, this
+   should be mentioned more clearly in the man page of Rcplex.
