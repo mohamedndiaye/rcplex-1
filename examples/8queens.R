@@ -21,5 +21,5 @@ dir3 <- rep (c("E", "L"), c(16, 26))
 ord <- order(q8[, 2])
 A <- simple_triplet_matrix(i = q8[, 1][ord], j = q8[, 2][ord],
                            v = q8[, 3][ord], ncol = length(obj), nrow = length(rhs))
-y <- Rcplex(obj, A, rhs, lb = 0, ub = 1, sense = dir3, objsense = "max", vtype = "B", control = list(round = TRUE), n = NA);
+y <- Rcplex(obj, A, rhs, lb = 0, ub = 1, sense = dir3, objsense = "max", vtype = "B", control = list(round = TRUE), n = 1);
 
