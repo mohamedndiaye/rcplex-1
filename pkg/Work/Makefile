@@ -4,8 +4,15 @@ PKG_PATH=$(shell dirname ${RUNIT_DIR})
 SOURCES=$(wildcard ${PKG_PATH}/src/*.c)
 OBJECTS=$(patsubst %.c,%.o,$(SOURCES))
 
-TARGET=Rcplex.so
-MKVARS=${PKG_PATH}/src/Makevars
+UNAME=$(shell uname)
+ifeq (${UNAME},Linux)
+	MKVARS=${PKG_PATH}/src/Makevars
+	TARGET=Rcplex.so
+else
+	MKVARS=${PKG_PATH}/src/Makevars.win
+	TARGET=Rcplex.dll
+endif
+
 CONF=${PKG_PATH}/configure
 
 # This has to change according to architecture
@@ -27,10 +34,10 @@ ${MKVARS}: ${CONF}
 
 ${TARGET}: ${MKVARS} ${SOURCES}
 	cd $(shell dirname $<); \
-	R CMD SHLIB -o ${TARGET} $(foreach OBJ,${OBJECTS},$(shell basename ${OBJ}))
+	R CMD SHLIB -o ${TARGET} $(foreach SRC,${SOURCES},$(shell basename ${SRC}))
 	cd ${RUNIT_DIR}
 
-%.o: %.c
+#%.o: %.c
 
 cleanso:
 	rm -f ${PKG_PATH}/src/*.so ${PKG_PATH}/src/*.o
