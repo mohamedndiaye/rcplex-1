@@ -159,19 +159,29 @@ void setparams(CPXENVptr env, SEXP control, int isQP, int isMIP) {
       status = CPXsetintparam(env, CPX_PARAM_FLOWCOVERS,
 			      *INTEGER(VECTOR_ELT(control, i)));
     }
+    /*
+     * solution pools not supported until cplex 11.0
+     */
+    
     else if(strcmp(cur_parm, "solnpoolagap") == 0){
       /* solution pool parameters */
+      #if CPX_VERSION >= 1100 
       status = CPXsetdblparam(env, CPX_PARAM_SOLNPOOLAGAP,
       			      *REAL(VECTOR_ELT(control, i)));
+      #endif
     }
     else if(strcmp(cur_parm, "solnpoolgap") == 0){
       /* solution pool parameters */
+      #if CPX_VERSION >= 1100
       status = CPXsetdblparam(env, CPX_PARAM_SOLNPOOLGAP,
 			      *REAL(VECTOR_ELT(control, i)));
+      #endif
     }
     else if(strcmp(cur_parm, "solnpoolintensity") == 0){
+      #if CPX_VERSION >= 1100
       status = CPXsetintparam(env, CPX_PARAM_SOLNPOOLINTENSITY, 
     			      *INTEGER(VECTOR_ELT(control, i)));
+      #endif
     }
     else {
       /* If parameter not known print a warning */

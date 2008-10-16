@@ -32,7 +32,7 @@ SEXP Rcplex(SEXP numcols_p,
   int isMIP      = INTEGER(isMIP_p)[0];
   int trace      = INTEGER(getListElement(control,"trace"))[0];
 
-  SEXP res;
+  SEXP res = NULL; /* set to avoid uninitialized warning */
   SEXP xopt;
   SEXP obj;
   SEXP solstat;
@@ -40,19 +40,35 @@ SEXP Rcplex(SEXP numcols_p,
   SEXP lambda;
   SEXP slack;
   SEXP nodecnt;
-  SEXP tmp;
 
   int status;
   int i, j;
   int cur_numrows, cur_numcols;
+
+  /*
+   * solution pools not supprted until cplex 11.0
+   */
+  #if CPX_VERSION >= 1100 
   int num_sol = 1;
-  
+  SEXP tmp;
+  #endif
+
   /* set maxnumcalls before init */
   max_numcalls = INTEGER(maxcalls)[0];
   /* initialize CPLEX environment */
   Rcplex_init();
 
   if(trace) Rprintf("Rcplex: num variables=%d num constraints=%d\n",numcols,numrows);
+
+  /*
+   * solution pools not supported until cplex 11.0
+   */
+  #if CPX_VERSION < 1100
+  if (INTEGER(num_poplim)[0] > 1) {
+    warning("Multiple solutions not supported in CPLEX version");
+    INTEGER(num_poplim)[0] = 1;
+  }
+  #endif 
 
   /* lb and ub */
   for (j = 0; j < numcols; ++j) {
@@ -115,7 +131,13 @@ SEXP Rcplex(SEXP numcols_p,
   if(isMIP) {
     
     status = CPXmipopt(env, lp);
+    
+    /*
+     * solutions pool not supported for versions of cplex < 11
+     * e.g., CPX_PARAM_POPULATELIM is not defined
+     */
 
+    #if CPX_VERSION >= 1100
     if(INTEGER(num_poplim)[0] > 1){
     /* in MIPs it is possible to have more than 1 solution. If
        num_poplim > 1 we now try to find these solutions.
@@ -135,6 +157,7 @@ SEXP Rcplex(SEXP numcols_p,
       /* now populate the solutions pool */
       status = CPXpopulate(env, lp);
     }
+    #endif
   }
   else if (isQP) {
     status = CPXqpopt(env, lp);
@@ -163,11 +186,15 @@ SEXP Rcplex(SEXP numcols_p,
     cur_numrows = CPXgetnumrows(env, lp);
     cur_numcols = CPXgetnumcols(env, lp);
 
-    num_sol = CPXgetsolnpoolnumsolns(env, lp);
-    
     /* if the 'n' parameter is set in R we always return a list with
        a number of elements equal to the number of solutions */
     if(INTEGER(num_poplim)[0] > 1){
+      /*
+       * solution pools not supported until cplex 11.0
+       */
+      #if CPX_VERSION >= 1100 
+      num_sol = CPXgetsolnpoolnumsolns(env, lp);
+
       /* MIP optimization results -> more than 1 solution */
       PROTECT(res = allocVector(VECSXP, num_sol));
 
@@ -205,6 +232,8 @@ SEXP Rcplex(SEXP numcols_p,
 
     	UNPROTECT(6);
       } /* END FOR */
+      #endif /* end #if CPX_VERSION >= 1100 */
+
     } /* END multiple solutions */
     else {
       /* MIP optimization 1 solution */

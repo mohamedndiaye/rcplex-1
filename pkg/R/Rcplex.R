@@ -196,7 +196,7 @@ check.Rcplex.control <- function(control, isQP)
                 ## of CPXMIP_OPTIMAL_TOL (102) instead of CPXMIP_OPTIMAL (101).
                 solnpoolintensity = 0L,  ## Solution pool intensity
                 ## User parameter
-                maxcalls          = 500L,## max calls to CPLEX lib allowed??
+                maxcalls          = 500L,## max calls to CPLEX lib before renewing license
                 round             = 0L)  ## round integer solutions after
                                          ## optimization 
     

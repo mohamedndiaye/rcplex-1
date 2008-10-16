@@ -10,6 +10,7 @@ suite <- defineTestSuite("Rcplex Unit Tests",
                         rngKind="default",
                         rngNormalKind="default")
 res <- runTestSuite(suite)
-printTextProtocol(res)
+printTextProtocol(res,file="rcplex.test.out")
+warnings()
 Rcplex.close()
 q()

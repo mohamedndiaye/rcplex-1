@@ -14,3 +14,7 @@ Several status codes indicate a success of the optimization process
 Is it probably better to return 0 if one of the above status codes are
    encountered and the status code otherwise? Nevertheless, this
    should be mentioned more clearly in the man page of Rcplex.
+
+* column-major order in simple_triplet_matrix
+
+This should be checked in the R side, and corrected if needed to avoid segfaults

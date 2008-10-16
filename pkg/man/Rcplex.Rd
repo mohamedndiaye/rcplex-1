@@ -56,7 +56,8 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
     populating the solution pool. The parameters \code{solnpoolagap},
     \code{solnpoolgap}, and \code{solnpoolintensity} influence the
     search for multiple solutions (see also the \code{control}
-    argument below for details). Default \code{1}.} 
+    argument below for details). Available from CPLEX 11.0 on. \code{Rcplex()}
+    raises a warning if an older version of CPLEX is used and \code{n>1}. Default \code{1}.} 
 }
 \details{
   Matrices \code{A} and \code{C} may be sparse matrices from a class in
@@ -69,8 +70,10 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
   We also provide a simple S3-style class for sparse matrices
   \code{simple_triplet_matrix}, as used in the \pkg{relations}
   package. Matrices \code{A} and \code{C} can be objects of this class.
-  See the \code{examples} for example usage.
-    
+  See the \code{examples} for example
+  usage. \code{simple_triplet_matrix} objects MUST be in column-major
+  order.
+  
   The \code{control} argument can be used to set CPLEX's many
   parameters, including the particular algorithm used for solving the given
   problem. See the \cite{ILOG CPLEX Parameters} guide for further
@@ -118,13 +121,14 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
       be in -1:2. Default 0 (automatic).}
     \item{solnpoolagap:}{Sets an absolute tolerance on the objective
       value for the solutions in the solution pool. Can be any
-      nonnegative real number. Default 0}
+      nonnegative real number. Ignored in versions < 11.0 of CPLEX. Default 0}
     \item{solnpoolgap:}{Sets a relative tolerance on the objective
       value for the solutions in the solution pool. Can be any
-      nonnegative real number. Default 0}
+      nonnegative real number. Ignored in versions < 11.0 of CPLEX. Default 0}
     \item{solnpoolintensity:}{Controls the trade-off between the number
       of solutions generated for the solution pool and the amount of
-      time and memory consumed. Must be in 0:4. Default 0 (automatic).}
+      time and memory consumed. Must be in 0:4. Ignored in versions <
+      11.0 of CPLEX. Default 0 (automatic).}
     \item{round:}{Flag indicating if integer solutions for MIPs should be
       rounded before returning. In some cases, CPLEX returns slightly
       infeasible integer solutions. Setting this option to 1 ensures
@@ -137,8 +141,8 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
   following components for each solution:
   \item{xopt}{Values of problem variables at optimum.}
   \item{obj }{Value of objective function at optimum.}
-  \item{status}{Solution status. 1 means successful completion. Check
-    CPLEX documentation for status codes.}
+  \item{status}{Solution status. See
+    CPLEX documentation for meaning of status codes.}
   \item{extra}{List with extra information about solution with components
     \describe{
       \item{slack:}{Values of slack variables for inequality
@@ -149,7 +153,7 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
   }
 }
 \references{ILOG CPLEX User's Guide }
-\author{Hector Corrada Bravo }
+\author{Hector Corrada Bravo and Stefan Theussl }
 \seealso{\code{\link{Rcplex.close}}, \code{\link{optim}}}
 \examples{
 ## A linear program (this is lpex1.c in the CPLEX examples)
