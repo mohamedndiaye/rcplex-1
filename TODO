@@ -1,3 +1,11 @@
+* Think about a function like
+   cplex_is_up_and_running() or check_for_free_license() to see if
+   Rcplex can be called at all
+
+   The function should check if the CPLEX environment can be opened at
+   all.
+* show "CPLEX environment opened" only if trace = 1 
+
 * status codes
 Several status codes indicate a success of the optimization process
 
