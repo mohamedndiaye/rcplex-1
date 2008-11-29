@@ -8,6 +8,7 @@ Installation of the Rcplex package requires the following information:
 As in regular usage of CPLEX, the environment variable ILOG_LICENSE_FILE must be set to the location of a file with a valid ILOG license key.
 
 
+
 ***LINUX INSTALLATION***
 For Linux, pointers on where to find this information can be found in <cplex_dir>/readme.html where <cplex_dir> is your cplex
 installation directory.
@@ -48,8 +49,6 @@ L
 
 
 
-
-
 ***WINDOWS***
 Installation in Windows systems is done by using the provided Makevars.win file in the src directory. It contains the following lines:
 
@@ -60,3 +59,12 @@ where <cplex_dir> is the cplex installation directory e.g. /c/ilog/cplex111. Ple
 
 We have successfully tested this procedure with CPLEX 11.1 on 32-bit Windows XP.
 
+
+
+***AIX***
+
+Installation in AIX was successful using IBM's XL C compiler and the following arguments to R CMD INSTALL:
+
+R CMD INSTALL Rcplex --configure-args="--with-cplex-include=<cplex_dir>/include --with-cplex-cflags=\"-q64\" --with-cplex-lib=\"-L<cplex_dir>/lib/power64_aix5.2_7.0/static_mt_stl -lcplex -lm -lpthread -q64\""
+
+This was successfully tested with CPLEX 11.2 for AIX (6.1.0) on Power systems (Power 6).

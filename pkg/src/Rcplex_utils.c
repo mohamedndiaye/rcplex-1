@@ -4,7 +4,7 @@
 #include "Rcplex.h"
 #include <time.h>
 
-void wait (int seconds) {
+void Rcplex_wait (int seconds) {
   clock_t endwait;
   endwait = clock() + seconds * CLOCKS_PER_SEC;
   while (clock() < endwait) {}
@@ -19,7 +19,7 @@ void Rcplex_init(void) {
   if (env == NULL) {
     env = CPXopenCPLEX (&status);
     while(env == NULL && numtries > 0) {
-      wait(30);
+      Rcplex_wait(30);
       numtries--;
     }
     if (env == NULL) {

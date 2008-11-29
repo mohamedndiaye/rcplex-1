@@ -171,7 +171,7 @@ check.Rcplex.control <- function(control, isQP)
                                          ## doesn't accept this ... 
                 epagap            = 0,## Absolute MIP gap tolerance 
                 epgap             = 1e-4,## Relative MIP gap tolerance 
-                tilim             = 1e75,## Optimizer time limit [sec]
+                tilim             = 1e74,## Optimizer time limit [sec]
                 disjcuts          = 0L,  ## disjunctive cuts switch
                 mipemphasis       = 0L,  ## MIP Emphasis switch
                 cliques           = 0L,  ## MIP cliques switch
