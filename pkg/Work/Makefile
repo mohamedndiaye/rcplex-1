@@ -17,6 +17,7 @@ CONF=${PKG_PATH}/configure
 
 # This has to change according to architecture
 CONFIG_ARGS=-with-cplex-dir=/s/cplex/cplex90
+#CONFIG_ARGS=-with-cplex-dir=/home/theussl/lib/CPLEX/cplex112
 
 all: build test
 

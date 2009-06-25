@@ -3,6 +3,7 @@ src.files <- list.files(file.path(pkg.dir,"R"),pattern=".*\\.R$")
 invisible(lapply(src.files,function(filenm) source(file.path(pkg.dir,"R",filenm))))
 dyn.load(file.path(pkg.dir,"src",paste("Rcplex",.Platform$dynlib.ext,sep="")))
 
+require("slam")
 cvec <- c(1,2,3);
 Amat <- matrix(c(-1,1,1,-1,3,-1),byrow=TRUE,nc=3);
 bvec <- c(20,-30);
