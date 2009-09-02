@@ -1,6 +1,29 @@
-0.2-2: S3 sparse matrix class now available in package slam
-0.2-1: Added support for finding alternative optima
-0.1-4: Added option to enforce rounding of integer variables in MIPs.
-0.1-3: Added support for Microsoft 
-0.1-2: Added simple_triplet_matrix class from relations package to support sparse Matrices
-0.1-1: First version: support for linear and quadratic, continuous and mixed-integer programs. Only Linux supported.
+Changes in 0.2-3:
+
+  o NEWS file now compatible with default R news reader.
+
+Changes in 0.2-2:
+
+  o S3 sparse matrix class now available in package 'slam'.
+
+Changes in 0.2-1:
+
+  o  Added support for finding alternative optima.
+
+Changes in 0.1-4: 
+
+  o Added option to enforce rounding of integer variables in MIPs.
+
+Changes in 0.1-3: 
+
+  o Added support for Microsoft.
+
+Changes in 0.1-2: 
+
+  o Added simple_triplet_matrix class from relations package to 
+    support sparse Matrices.
+
+Changes in 0.1-1: 
+
+  o First version: support for linear and quadratic, continuous 
+    and mixed-integer programs. Only Linux supported.
