@@ -2,3 +2,5 @@ useDynLib(Rcplex)
 
 export(Rcplex, Rcplex.close)
 import("slam")
+
+S3method(as.quadratic_constraint, list)

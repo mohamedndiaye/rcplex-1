@@ -18,9 +18,8 @@ SEXP Rcplex_QCP(SEXP numcols_p,
 		SEXP control,
 		SEXP maxcalls,
 		SEXP isQCP_p,
-		SEXP QCmat,
-		SEXP rvec,
-		SEXP Qsense)
+		SEXP QC,
+		SEXP nQC)
 {
   char *probname = "Rcplex";
   int numcols    = INTEGER(numcols_p)[0]; 
@@ -64,6 +63,8 @@ SEXP Rcplex_QCP(SEXP numcols_p,
   Rcplex_init();
 
   if(trace) Rprintf("Rcplex: num variables=%d num constraints=%d\n",numcols,numrows);
+
+  if(trace) Rprintf("Rcplex: isQP=%d isQCP=%d isMIP=%d\n", isQP, isQCP, isMIP);
 
   /*
    * solution pools not supported until cplex 11.0
@@ -115,8 +116,27 @@ SEXP Rcplex_QCP(SEXP numcols_p,
   if (status) {
     my_error(("Failed to copy problem data.\n"));
   }
+  if(trace) Rprintf("Rcplex: done copying linear part\n");
 
   /* Quadratic part of objective function 1/2 x^t Q x */
+  /*int CPXcopyquad(CPXCENVptr env, CPXLPptr lp, 
+                    const int * qmatbeg, 
+                    const int * qmatcnt, 
+                    const int * qmatind, 
+                    const double * qmatval) */ 
+  /* The arrays qmatbeg and qmatcnt should be of length at least
+     CPXgetnumcols(env,lp). The arrays qmatind and qmatval should be
+     of length at least qmatbeg[numcols-1]+qmatcnt[numcols-1]. CPLEX
+     requires only the nonzero coefficients grouped by column in the
+     array qmatval. The nonzero elements of every column must be
+     stored in sequential locations in this array with qmatbeg[j]
+     containing the index of the beginning of column j and qmatcnt[j]
+     containing the number of entries in column j. Note that the
+     components of qmatbeg must be in ascending order. For each k,
+     qmatind[k] indicates the column number of the corresponding
+     coefficient, qmatval[k]. These arrays are accessed as explained
+     above. */
+
   if (isQP) {
     status = CPXcopyquad(env, lp,
 			 INTEGER(VECTOR_ELT(Qmat, 0)),
@@ -126,6 +146,7 @@ SEXP Rcplex_QCP(SEXP numcols_p,
     if (status) {
       my_error(("Failed to copy quadratic term of problem data.\n"));
     }
+    if(trace) Rprintf("Rcplex: done copying quadratic part\n");
   }
   
   /* Quadratic part of constraints a_i^tx + 1/2 x^t Q_i x <= r_i*/
@@ -134,28 +155,37 @@ SEXP Rcplex_QCP(SEXP numcols_p,
                        int quadnzcnt, double rhs, int sense, 
                        const int * linind, const double * linval, 
                        const int * quadrow, const int * quadcol, 
-                       const double * quadval, const char * lname_str)
-  */
+                       const double * quadval, const char *
+                       lname_str) */
+  /* The nonzero coefficients of the quadratic terms must be stored in
+     sequential locations in the arrays quadrow, quadcol and quadval
+     from positions 0 to quadnzcnt-1. Each pair, quadrow[i],
+     quadcol[i], indicates the variable indices of the quadratic term,
+     and quadval[i] the corresponding coefficient. */
+
   if (isQCP) {
     /* TODO: linnzcount set to 0, linind and kinval to NULL since 
        linear part will be added later */
     /* Q_i will be checked if positive semi definite by the callable
        lib */
     /* TODO: iterate over a list of quadratic constraints */
-    status = CPXaddqconstr (env, lp, 
-			    0,         
-			    INTEGER(VECTOR_ELT(QCmat, 0)), 
-			    REAL(rvec)[0], 
-			    CHAR(Qsense)[0],
-			    NULL, 
-			    NULL, 
-			    INTEGER(VECTOR_ELT(QCmat, 1)), 
-			    INTEGER(VECTOR_ELT(QCmat, 2)), 
-			    INTEGER(VECTOR_ELT(QCmat, 3)), 
-			    NULL);
-
-    if (status) {
-      my_error(("Failed to add quadratic constraints to problem data.\n"));
+    for(i = 0; i < INTEGER(nQC)[0]; i++){
+      
+      status = CPXaddqconstr (env, lp, 
+			      INTEGER( VECTOR_ELT(VECTOR_ELT(QC, i), 4) )[0],    
+			      INTEGER( VECTOR_ELT(VECTOR_ELT(QC, i), 5) )[0], 
+			      REAL(    VECTOR_ELT(VECTOR_ELT(QC, i), 3) )[0],
+			      CHAR(    STRING_ELT(VECTOR_ELT(VECTOR_ELT(QC, i), 2), 0) )[0],
+			      NULL, 
+			      NULL, 
+			      INTEGER( VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, i), 1), 0) ), 
+			      INTEGER( VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, i), 1), 1) ), 
+			      REAL(    VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, i), 1), 2) ), 
+			      NULL);
+      if (status) {
+	my_error(("Failed to add quadratic constraints to problem data.\n"));
+      }
+      if(trace) Rprintf("Rcplex: done copying quadratic constraints\n");
     }
   }
   
@@ -198,11 +228,11 @@ SEXP Rcplex_QCP(SEXP numcols_p,
     }
     #endif
   }
-  else if (isQP) {
-    status = CPXqpopt(env, lp);
-  }
   else if (isQCP) {
    status = CPXbaropt (env, lp); 
+  }
+  else if (isQP) {
+    status = CPXqpopt(env, lp);
   }
   else {
     status = CPXlpopt(env, lp);
