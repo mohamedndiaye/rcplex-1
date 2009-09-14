@@ -2,30 +2,53 @@
 ## Code for handling quadratic constraints
 
 ## Constructor for building quadratic constraints
-quadratic_constraint <- function( a = NULL, Q, dir = c("L", "G"), b ) {
-  if( !is.null(a) )
-    a <- as.double( a )
-  out <- list( a = a,
-               Q = as.simple_triplet_matrix(Q),
-               dir = as.character(match.arg(dir)),
-               b = as.double(b),
-               nlinc = as.integer(length(a)),
-               nqc   = as.integer(length(as.simple_triplet_matrix(Q)$v)) )
-  out
-  ## FIXME: currently we modify row and column indices in
-  ##        simple_triplet_matrix, so that we can use them in C
-  out$Q$i <- out$Q$i - 1L
-  out$Q$j <- out$Q$j - 1L
+quadratic_constraint <- function( QC, dir, b ) {
+  stopifnot( all(dir %in% c("L", "G")) )
+  len_Q <- length(QC$Q)
+  len_L <- length(QC$L)
+  if(!len_L){
+    len_L <- len_Q
+    QC$L <- vector("list", len_L)
+  }
+  stopifnot( all(c(len_Q, len_L, length(dir)) == length(b)) )
+  QC$Q <- lapply( QC$Q, as.simple_triplet_matrix )
+  QC$Q <- lapply( QC$Q, function(x) {x$i <- x$i - 1L
+                                     x$j <- x$j - 1L
+                                     x } )
+  ## FIXME: Currently only dense vectors as input supported
+  QC$L <- lapply( QC$L, as.sparse_vector)
+  QC$linnzcount <- sapply( QC$L, function(x) {len <- length(x)
+                                         if(!len)
+                                           len <- 0L
+                                         as.integer(length(x))} )
+  if( !length(QC$linnzcount) )
+    QC$linnzcount <- rep(0L, len_Q)
+  QC$quadnzcount <- as.integer(lapply(QC$Q, function(x) length(x$v)))
+
+  out <- list( QC,
+               dir = as.character(dir),
+               b = as.double(b)
+               )
   
   class(out) <- "quadratic_constraint"
   out
+}
+
+as.sparse_vector <- function(x){
+  if(is.null(x))
+    return(list(i = as.integer(NULL), v = as.double(NULL)))
+  if(!is.vector(x))
+    stop("'x' must be a vector")
+  ind <- which(x != 0)
+  val <- x[ind]
+  list(i = as.integer(ind), v = as.double(val))
 }
 
 as.quadratic_constraint <- function(x, ...)
   UseMethod("as.quadratic_constraint")
 
 as.quadratic_constraint.list <- function(x){
-  quadratic_constraint(x$a, x$Q, x$dir, x$b)
+  quadratic_constraint(x$QC, x$dir, x$b)
 }
 
 as.quadratic_constraint.quadratic_constraint <- function(x) {

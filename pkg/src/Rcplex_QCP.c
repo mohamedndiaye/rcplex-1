@@ -172,15 +172,15 @@ SEXP Rcplex_QCP(SEXP numcols_p,
     for(i = 0; i < INTEGER(nQC)[0]; i++){
       
       status = CPXaddqconstr (env, lp, 
-			      INTEGER( VECTOR_ELT(VECTOR_ELT(QC, i), 4) )[0],    
-			      INTEGER( VECTOR_ELT(VECTOR_ELT(QC, i), 5) )[0], 
-			      REAL(    VECTOR_ELT(VECTOR_ELT(QC, i), 3) )[0],
-			      CHAR(    STRING_ELT(VECTOR_ELT(VECTOR_ELT(QC, i), 2), 0) )[0],
-			      NULL, 
-			      NULL, 
-			      INTEGER( VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, i), 1), 0) ), 
-			      INTEGER( VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, i), 1), 1) ), 
-			      REAL(    VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, i), 1), 2) ), 
+			      INTEGER( VECTOR_ELT(VECTOR_ELT(QC, 0), 2) )[i],
+			      INTEGER( VECTOR_ELT(VECTOR_ELT(QC, 0), 3) )[i],
+			      REAL(    VECTOR_ELT(QC, 2) )[i],
+			      CHAR(    STRING_ELT(VECTOR_ELT(QC, 1), i) )[0],
+			      INTEGER( VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, 0), 1), i), 0) ),
+			      REAL(    VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, 0), 1), i), 1) ),
+			      INTEGER( VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, 0), 0), i), 0) ),
+                              INTEGER( VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, 0), 0), i), 1) ),
+                              REAL(    VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(QC, 0), 0), i), 2) ),
 			      NULL);
       if (status) {
 	my_error(("Failed to add quadratic constraints to problem data.\n"));

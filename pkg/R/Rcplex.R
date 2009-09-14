@@ -128,7 +128,7 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
   }
 
 ###########################################################################
-## The following function solves a linear program (LP).
+## The following function solves a given linear program (LP).
 
 Rcplex_solve_LP <- function( cvec, Amat, bvec, lb = 0, ub = Inf, sense = "L",
                              objsense = c("min", "max"), vtype = NULL, n = 1,
@@ -144,7 +144,7 @@ Rcplex_solve_LP <- function( cvec, Amat, bvec, lb = 0, ub = Inf, sense = "L",
 }
 
 ###########################################################################
-## The following function solves a quadratic program (QP).
+## The following function solves a given quadratic program (QP).
 ## It is similar to Rcplex() but forces the user to provide Qmat
 
 Rcplex_solve_QP <- function( cvec, Amat, bvec, Qmat, lb = 0, ub = Inf,
@@ -208,7 +208,7 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
 ###########################################################################
 ## Calls the solver
 
-.Rcplex_solve <- function( cvec, Amat, bvec,Qmat, QC, lb, ub,
+.Rcplex_solve <- function( cvec, Amat, bvec, Qmat, QC, lb, ub,
                            sense, objsense, vtype, n, control, nvars, nconstr) {
 
   ## prepare date for solver
@@ -253,9 +253,9 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
 
   ## Quadratic constraints
   if(isQCP){
-    QC <- lapply(QC, as.quadratic_constraint)
+    QC <- as.quadratic_constraint(QC)
   }
-  nQC <- length(QC)
+  nQC <- length(QC$dir)
   
   ## Call cplex interface
   res <- .Call( "Rcplex_QCP",
