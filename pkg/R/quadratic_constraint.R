@@ -35,13 +35,22 @@ quadratic_constraint <- function( QC, dir, b ) {
 }
 
 as.sparse_vector <- function(x){
-  if(is.null(x))
-    return(list(i = as.integer(NULL), v = as.double(NULL)))
-  if(!is.vector(x))
-    stop("'x' must be a vector")
+  UseMethod("as.sparse_vector")
+}
+
+as.sparse_vector.NULL <- function(x) {
+  list(i = as.integer(NULL), v = as.double(NULL))
+}
+
+as.sparse_vector.numeric <- function(x){
   ind <- which(x != 0)
   val <- x[ind]
   list(i = as.integer(ind), v = as.double(val))
+}
+
+as.sparse_vector.simple_triplet_matrix<- function(x){
+  stopifnot( dim(x)[1] == 1 )
+  list(i = as.integer(x$j), v = as.double(x$v))
 }
 
 as.quadratic_constraint <- function(x, ...)

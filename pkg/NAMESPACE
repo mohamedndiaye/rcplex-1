@@ -4,3 +4,8 @@ export(Rcplex, Rcplex.close)
 import("slam")
 
 S3method(as.quadratic_constraint, list)
+
+## for the time being
+S3method("as.sparse_vector", "NULL")
+S3method("as.sparse_vector", "numeric")
+S3method("as.sparse_vector", "simple_triplet_matrix")
