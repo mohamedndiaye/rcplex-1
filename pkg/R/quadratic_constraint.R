@@ -3,6 +3,8 @@
 
 ## Constructor for building quadratic constraints
 quadratic_constraint <- function( QC, dir, b ) {
+  ## from refcallablelibrary.pdf: only 'L' and 'G' are allowed in
+  ## Q constraints
   stopifnot( all(dir %in% c("L", "G")) )
   len_Q <- length(QC$Q)
   len_L <- length(QC$L)
