@@ -27,7 +27,7 @@ dnl
 dnl 4. If none of the above are given, the script tries to find the location of the CPLEX installation and then does the same as 3.
 
 
-AC_INIT([Rcplex], 0.1.3)
+AC_INIT([Rcplex], 0.3.0)
 
 FOUND_ALL="no"
 
@@ -87,8 +87,12 @@ fi
 
 dnl No information given try to guess it from location of interactive optimizer
 if test ["$FOUND_ALL" = "no" -a -z "$CPLEX_DIR"] ; then
-   AC_PATH_PROG(CPLEX_BIN,cplex)
+   AC_PATH_PROG(CPLEX_BIN, cplex)
    CPLEX_DIR=`AS_DIRNAME(["$CPLEX_BIN"])`
+   ## Autoconf docs say that basename is not portable and one should use
+   ## expr instead.  Let us use AS_BASENAME, even though this is not in
+   ## the docs ...
+   SYSTEM=`AS_BASENAME(["$CPLEX_DIR"])`
    CPLEX_DIR=`AS_DIRNAME(["$CPLEX_DIR"])`
    CPLEX_DIR=`AS_DIRNAME(["$CPLEX_DIR"])`
    if test [-n "$CPLEX_DIR"] ; then
@@ -102,12 +106,11 @@ if test ["$FOUND_ALL" = "no"] ; then
       AC_MSG_ERROR([CPLEX include directory ${CPLEX_DIR}/include does not exist])
    fi
 
-   dnl guess system and libformat, just grab the first that come up
-   SYSTEM=`ls -l ${CPLEX_DIR}/lib | awk '($1 ~ /d/) && ($NF !~ /jar/) {print $NF}' - | head -n1 -`
    if test [-z "$SYSTEM" -o ! -d "${CPLEX_DIR}/lib/${SYSTEM}"] ; then
       AC_MSG_ERROR([CPLEX library location could not be found])
    fi
 
+   ## Guess libformat: just grab the first that comes up.
    LIBFORMAT=`ls -l ${CPLEX_DIR}/lib/${SYSTEM} | awk '($1 ~ /d/) {print $NF}' | head -n1 -`
    if test [-z "$LIBFORMAT" -a ! -d "${CPLEX_DIR}/lib/${SYSTEM}/${LIBFORMAT}"] ; then
       AC_MSG_ERROR([CPLEX library location could not be found])
