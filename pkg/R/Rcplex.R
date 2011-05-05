@@ -9,7 +9,7 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
     stopifnot((is(Amat, "matrix") && is.real(Amat)) ||
                is(Amat, "dsparseMatrix") ||
                is(Amat, "simple_triplet_matrix"))
-    
+
     numrows <- nrow(Amat)
     numcols <- ncol(Amat)
 
@@ -20,11 +20,11 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
                  is(Qmat, "simple_triplet_matrix"),
                 nrow(Qmat) == numcols, ncol(Qmat) == numcols)
     }
-    
+
     ## check data dimensions
     stopifnot(length(cvec) == numcols, is.real(cvec),
               length(bvec) == numrows, is.real(bvec))
-    
+
 
     ## check bounds
     if (length(lb) == 1L)
@@ -39,9 +39,9 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
     ## check and set objective sense
     if(missing(objsense))
       objsense <- "min"
-    
+
     stopifnot(objsense %in% c("min","max"))
-    
+
     if (objsense == "min") {
       objsensei <- 1L
     }
@@ -75,7 +75,7 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
     ## we take the value from the User's manual
     if(is.na(n))
       n <- 2.1e+9L
-    
+
     ## coerce Amat and Qmat to CPX matrices
     Acpx <- toCPXMatrix(Amat)
     Qcpx <- toCPXMatrix(Qmat)
@@ -153,14 +153,14 @@ Rcplex_solve_QP <- function( cvec, Amat, bvec, Qmat, lb = 0, ub = Inf,
 
   ## check and set objective sense
   objsense <- match.arg( objsense )
-  
+
   ## solve the mathematical program
   Rcplex_solve_QCP( cvec = cvec, Amat = Amat, bvec = bvec, Qmat = Qmat,
                     QC = NULL, lb = lb, ub = ub, sense = sense,
                     objsense = objsense, vtype = vtype, n = n,
                     control = control )
 }
-  
+
 ###########################################################################
 ## The following function solves a quadratically constrained program (QCP)
 
@@ -175,7 +175,7 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
   ## number objective variables, number constraints
   numrows <- nrow(Amat)
   numcols <- ncol(Amat)
-  
+
   ## bounds
   if (length(lb) == 1L)
     lb <- rep(lb, numcols)
@@ -185,7 +185,7 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
   ## check constraints sense
   if (length(sense) == 1L)
     sense <- rep(sense, numrows)
-  
+
   ## vtypes
   if( !is.null(vtype) )
     if( length(vtype) == 1L )
@@ -196,7 +196,7 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
                                  Qmat = Qmat, QC = QC, lb = lb, ub = ub,
                                  sense = sense, objsense = objsense,
                                  vtype = vtype, nvars = numcols,
-                                 nconstr = numrows )  
+                                 nconstr = numrows )
 
   .Rcplex_solve( cvec = cvec, Amat = Amat, bvec = bvec,
                  Qmat = Qmat, QC = QC, lb = lb, ub = ub,
@@ -216,7 +216,7 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
   ## coerce Amat and Qmat to CPX matrices
   Acpx <- toCPXMatrix(Amat)
   Qcpx <- toCPXMatrix(Qmat)
-  
+
   if (objsense == "min") {
     objsensei <- 1L
   }
@@ -236,7 +236,7 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
 
   ## do we have a QCP?
   isQCP <- ifelse(is.null(QC), 0L, 1L)
-  
+
   ## check number of solutions
   n <- as.integer(n)
   ## if NA then find all solutions (at most max. integer solutions)
@@ -248,7 +248,7 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
   ## check control list
   control <- check.Rcplex.control(control, isQP)
   control <- split.control.list  (control)
-  
+
   on.exit(.C("Rcplex_free"))
 
   ## Quadratic constraints
@@ -256,7 +256,7 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
     QC <- as.quadratic_constraint(QC)
   }
   nQC <- length(QC$dir)
-  
+
   ## Call cplex interface
   res <- .Call( "Rcplex_QCP",
                 as.integer(nvars),
@@ -278,7 +278,7 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
                 as.integer(isQCP),
                 QC,
                 as.integer(nQC) )
-  
+
   if (isMIP) {
     intvars <- which(vtype != 'C')
     .canonicalize <- function(x){
@@ -297,7 +297,7 @@ Rcplex_solve_QCP <- function( cvec, Amat, bvec, Qmat = NULL, QC, lb = 0,
     names(res) <- c("xopt", "obj", "status", "extra")
     names(res$extra) <- c("lambda", "slack")
   }
-  
+
   ## return solution
   res
 }
@@ -317,11 +317,11 @@ Rcplex_check_input_for_sanity <- function( cvec, Amat, bvec,Qmat,
   if( !is.null(Qmat) ) {
     stopifnot( Rcplex_check_Qmat_for_sanity(Qmat, nvars) )
   }
-  
+
   ## check data dimensions
   stopifnot( Rcplex_check_cvec_for_sanity(cvec, nvars),
-             Rcplex_check_cvec_for_sanity(bvec, nconstr) )
-    
+             Rcplex_check_bvec_for_sanity(bvec, nconstr) )
+
   stopifnot( Rcplex_check_bounds_for_sanity(lb, nvars),
              Rcplex_check_bounds_for_sanity(ub, nvars) )
 
@@ -337,7 +337,7 @@ Rcplex_check_cvec_for_sanity <- function(x, nvars){
 }
 
 Rcplex_check_bvec_for_sanity <- function(x, nconstr){
-  all( c(length(x) == nconstr, is.real(cvec)) )
+  all( c(length(x) == nconstr, is.real(x)) )
 }
 
 Rcplex_check_matrix_for_sanity <- function(x){
