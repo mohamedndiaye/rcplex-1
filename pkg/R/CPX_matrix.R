@@ -24,5 +24,5 @@ toCPXMatrix <- function(Amat)
     }
     
     return(list(matbeg = as.integer(matbeg), matcnt = as.integer(matcnt),
-                matind = as.integer(matind), matval = as.real(matval)))
+                matind = as.integer(matind), matval = as.double(matval)))
   }

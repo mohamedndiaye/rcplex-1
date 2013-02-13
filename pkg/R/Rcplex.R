@@ -6,7 +6,7 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
                    vtype = NULL, n = 1)
   {
     ## check constraints matrix A
-    stopifnot((is(Amat, "matrix") && is.real(Amat)) ||
+    stopifnot((is(Amat, "matrix") && is.double(Amat)) ||
                is(Amat, "dsparseMatrix") ||
                is(Amat, "simple_triplet_matrix"))
 
@@ -15,15 +15,15 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
 
     ## check Q matrix if given
     if (!is.null(Qmat)) {
-      stopifnot((is(Qmat, "matrix") && is.real(Qmat)) ||
+      stopifnot((is(Qmat, "matrix") && is.double(Qmat)) ||
                  is(Qmat, "dsparseMatrix") ||
                  is(Qmat, "simple_triplet_matrix"),
                 nrow(Qmat) == numcols, ncol(Qmat) == numcols)
     }
 
     ## check data dimensions
-    stopifnot(length(cvec) == numcols, is.real(cvec),
-              length(bvec) == numrows, is.real(bvec))
+    stopifnot(length(cvec) == numcols, is.double(cvec),
+              length(bvec) == numrows, is.double(bvec))
 
 
     ## check bounds
@@ -33,8 +33,8 @@ Rcplex <- function(cvec, Amat, bvec, Qmat = NULL, lb = 0, ub = Inf,
     if (length(ub) == 1L)
       ub <- rep(ub,numcols)
 
-    stopifnot(length(lb) == numcols, is.real(lb),
-              length(ub) == numcols, is.real(ub))
+    stopifnot(length(lb) == numcols, is.double(lb),
+              length(ub) == numcols, is.double(ub))
 
     ## check and set objective sense
     if(missing(objsense))
@@ -333,15 +333,15 @@ Rcplex_check_input_for_sanity <- function( cvec, Amat, bvec,Qmat,
 }
 
 Rcplex_check_cvec_for_sanity <- function(x, nvars){
-  all( c(length(x) == nvars, is.real(x)) )
+  all( c(length(x) == nvars, is.double(x)) )
 }
 
 Rcplex_check_bvec_for_sanity <- function(x, nconstr){
-  all( c(length(x) == nconstr, is.real(x)) )
+  all( c(length(x) == nconstr, is.double(x)) )
 }
 
 Rcplex_check_matrix_for_sanity <- function(x){
-  ( is( x, "matrix" ) && is.real(x) ) ||
+  ( is( x, "matrix" ) && is.double(x) ) ||
   is( x, "dsparseMatrix" )            ||
   is( x, "simple_triplet_matrix" )
 }
@@ -359,7 +359,7 @@ Rcplex_check_row_sense_for_sanity <- function(x, nconstr){
 }
 
 Rcplex_check_bounds_for_sanity <- function(x, nvars){
-  all( c(length(x) == nvars, is.real(x)) )
+  all( c(length(x) == nvars, is.double(x)) )
 }
 
 Rcplex_check_vtype_for_sanity <- function(x, nvars) {
