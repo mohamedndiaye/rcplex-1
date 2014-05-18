@@ -27,7 +27,7 @@ dnl
 dnl 4. If none of the above are given, the script tries to find the location of the CPLEX installation and then does the same as 3.
 
 
-AC_INIT([Rcplex], 0.3.0)
+AC_INIT([Rcplex], 0.3.2)
 
 FOUND_ALL="no"
 
@@ -106,8 +106,12 @@ if test ["$FOUND_ALL" = "no"] ; then
       AC_MSG_ERROR([CPLEX include directory ${CPLEX_DIR}/include does not exist])
    fi
 
-   if test [-z "$SYSTEM" -o ! -d "${CPLEX_DIR}/lib/${SYSTEM}"] ; then
-      AC_MSG_ERROR([CPLEX library location could not be found])
+   if test [-z "$SYSTEM" ] ; then
+      ## Set system as the first found
+      SYSTEM=`ls -l ${CPLEX_DIR}/bin | awk '($1 ~ /d/) {print $NF}' | head -n1 -`
+      if test [! -d "${CPLEX_DIR}/bin/${SYSTEM}" ] ; then
+            AC_MSG_ERROR([CPLEX library location could not be found])
+      fi
    fi
 
    ## Guess libformat: just grab the first that comes up.
@@ -125,12 +129,12 @@ dnl check for awk
    AC_PROG_AWK
 
    CPLEXLIBDIR="${CPLEX_DIR}/lib/${SYSTEM}/${LIBFORMAT}"
-   CPLEX_LIBS="-L${CPLEXLIBDIR} `${AWK} 'BEGIN {ORS = " "} /^CLNFLAGS/ {for (i=4;i<=NF;++i) print $i}' ${CPLEX_MAKEFILE}`"
+   CPLEX_LIBS="-L${CPLEXLIBDIR} `${AWK} 'BEGIN {FS = " = "} /^CLNFLAGS/ {print $2}' ${CPLEX_MAKEFILE}`"
    if test [-z CPLEX_LIBS] ; then
       AC_MSG_ERROR([Could not get library info from CPLEX example Makefile])
    fi
 
-   CPLEX_COPT=`${AWK} 'BEGIN {ORS = " "} /^COPT/ {for (i=3;i<=NF;++i) print $i}' ${CPLEX_MAKEFILE}`
+   CPLEX_COPT=`${AWK} 'BEGIN {FS = " = "} /^COPT/ {print $2}' ${CPLEX_MAKEFILE}`
    if test [-z CPLEX_COPT] ; then
       AC_MSG_ERROR([Could not get compiler options from CPLEX example Makefile])
    fi

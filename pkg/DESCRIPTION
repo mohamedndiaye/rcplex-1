@@ -1,6 +1,6 @@
 Package: Rcplex
-Version: 0.3-1
-Date: 2013-02-13
+Version: 0.3-2
+Date: 2014-05-18
 Title: R interface to CPLEX
 Author: Hector Corrada Bravo, with contributions from Stefan Theussl and Kurt Hornik
 Maintainer: Hector Corrada Bravo <hcorrada@gmail.com>
