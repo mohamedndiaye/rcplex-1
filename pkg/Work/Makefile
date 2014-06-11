@@ -5,7 +5,11 @@ SOURCES=$(wildcard ${PKG_PATH}/src/*.c)
 OBJECTS=$(patsubst %.c,%.o,$(SOURCES))
 
 UNAME=$(shell uname)
+
 ifeq (${UNAME},Linux)
+	MKVARS=${PKG_PATH}/src/Makevars
+	TARGET=Rcplex.so
+else ifeq (${UNAME},Darwin)
 	MKVARS=${PKG_PATH}/src/Makevars
 	TARGET=Rcplex.so
 else
@@ -16,8 +20,9 @@ endif
 CONF=${PKG_PATH}/configure
 
 # This has to change according to architecture
-CONFIG_ARGS=-with-cplex-dir=/opt/stow/ILOG/CPLEX_Studio126/cplex
+#CONFIG_ARGS=-with-cplex-dir=/s/cplex/cplex90
 #CONFIG_ARGS=-with-cplex-dir=/home/theussl/lib/CPLEX/cplex121
+CONFIG_ARGS=-with-cplex-dir=/Users/hcorrada/Applications/IBM/ILOG/CPLEX_Studio125/cplex
 
 all: build test
 
