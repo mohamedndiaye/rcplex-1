@@ -1,12 +1,15 @@
 Package: Rcplex
-Version: 0.3-2
-Date: 2014-05-18
+Version: 0.3-3
+Date: 2016-05-20
 Title: R interface to CPLEX
-Author: Hector Corrada Bravo, with contributions from Stefan Theussl and Kurt Hornik
-Maintainer: Hector Corrada Bravo <hcorrada@gmail.com>
+Authors@R: c( person("Hector Corrada", "Bravo", role = c("aut", "cre"), email = "hcorrada@gmail.com"),
+	      person("Kurt", "Hornik", role = "ctb"),
+              person("Stefan", "Theussl", role = "aut") )
 Description: R interface to CPLEX solvers for linear, quadratic, and (linear and quadratic) mixed integer programs. Support for quadratically constrained programming is available. A working installation of CPLEX is required for usage of the Rcplex package. See the file "INSTALL" for details on how to install the Rcplex package in Linux/Unix-like systems and Windows systems. Support for sparse matrices is provided by an S3-style class "simple_triplet_matrix" from package slam and by objects from the Matrix package class hierarchy.
 LazyLoad: yes
 Depends: R (>= 2.6.0), slam
+Imports: methods
 Enhances: Matrix
+SystemRequirements: IBM ILOG CPLEX libraries and headers
 License: LGPL (>= 2.0)
 URL: http://R-Forge.R-project.org/projects/rcplex

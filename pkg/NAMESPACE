@@ -1,7 +1,8 @@
 useDynLib(Rcplex)
 
-export(Rcplex, Rcplex.close)
+export(Rcplex, Rcplex.close, Rcplex_solve_QCP)
 import("slam")
+importFrom("methods", "as", "is")
 
 S3method(as.quadratic_constraint, list)
 
