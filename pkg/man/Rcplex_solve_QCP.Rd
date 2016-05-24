@@ -34,7 +34,7 @@ Rcplex_solve_QCP(cvec, Amat, bvec, Qmat = NULL, QC,
   \item{QC}{a list with three elements: \code{QC}, \code{dir}, and
   \code{b}. The element \code{QC} is a list with the quadratic part
   \code{Q}, a matrix, and the linear part of the constraint \code{L}, a
-  numeric. \code{dir} has the same meaning as argument \code{sense} and
+  numeric (currently nonzero values are not supported). \code{dir} has the same meaning as argument \code{sense} and
   \code{b} as \code{bvec}.} 
   \item{lb}{ Lower bound on the problem variables. If
     \code{length(lb)==1} then \code{lb} is the lower bound of all
@@ -111,6 +111,9 @@ ub <- c(40, Inf, Inf)
 res <- Rcplex_solve_QCP(c,A, b, Q, ub = ub, QC = QC, sense = dir, objsense = "max")
 print(res)
 
+## solve MIQCP
+res <- Rcplex_solve_QCP(c,A, b, Q, ub = ub, QC = QC, sense = dir, objsense = "max", vtype = c("C", "I", "C"))
+
 ## quadratic and linear part
 QC <- list(QC = list(Q = list(diag(1, nrow = 3)), L = list(c(3,4,-3))), dir = "L", b = 1)
 
@@ -118,8 +121,6 @@ QC <- list(QC = list(Q = list(diag(1, nrow = 3)), L = list(c(3,4,-3))), dir = "L
 res <- Rcplex_solve_QCP(c,A, b, Q, ub = ub, QC = QC, sense = dir, objsense = "max")
 print(res)
 
-## solve MIQCP
-res <- Rcplex_solve_QCP(c,A, b, Q, ub = ub, QC = QC, sense = dir, objsense = "max", vtype = c("C", "I", "C"))
 
 Rcplex.close()
 }

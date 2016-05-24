@@ -62,9 +62,9 @@ SEXP Rcplex_QCP(SEXP numcols_p,
   /* initialize CPLEX environment */
   Rcplex_init();
 
-  if(trace) Rprintf("Rcplex: num variables=%d num constraints=%d\n",numcols,numrows);
+  //if(trace) Rprintf("Rcplex: num variables=%d num constraints=%d\n",numcols,numrows);
 
-  if(trace) Rprintf("Rcplex: isQP=%d isQCP=%d isMIP=%d\n", isQP, isQCP, isMIP);
+  //if(trace) Rprintf("Rcplex: isQP=%d isQCP=%d isMIP=%d\n", isQP, isQCP, isMIP);
 
   /*
    * solution pools not supported until cplex 11.0
@@ -116,7 +116,7 @@ SEXP Rcplex_QCP(SEXP numcols_p,
   if (status) {
     my_error(("Failed to copy problem data.\n"));
   }
-  if(trace) Rprintf("Rcplex: done copying linear part\n");
+  //if(trace) Rprintf("Rcplex: done copying linear part\n");
 
   /* Quadratic part of objective function 1/2 x^t Q x */
   /*int CPXcopyquad(CPXCENVptr env, CPXLPptr lp, 
@@ -146,7 +146,7 @@ SEXP Rcplex_QCP(SEXP numcols_p,
     if (status) {
       my_error(("Failed to copy quadratic term of problem data.\n"));
     }
-    if(trace) Rprintf("Rcplex: done copying quadratic part\n");
+  //  if(trace) Rprintf("Rcplex: done copying quadratic part\n");
   }
   
   /* Quadratic part of constraints a_i^tx + 1/2 x^t Q_i x <= r_i*/
@@ -164,11 +164,8 @@ SEXP Rcplex_QCP(SEXP numcols_p,
      and quadval[i] the corresponding coefficient. */
 
   if (isQCP) {
-    /* TODO: linnzcount set to 0, linind and kinval to NULL since 
-       linear part will be added later */
     /* Q_i will be checked if positive semi definite by the callable
        lib */
-    /* TODO: iterate over a list of quadratic constraints */
     for(i = 0; i < INTEGER(nQC)[0]; i++){
       
       status = CPXaddqconstr (env, lp, 
@@ -185,24 +182,24 @@ SEXP Rcplex_QCP(SEXP numcols_p,
       if (status) {
 	my_error(("Failed to add quadratic constraints to problem data.\n"));
       }
-      if(trace) Rprintf("Rcplex: done copying quadratic constraints\n");
+      //if(trace) Rprintf("Rcplex: done copying quadratic constraints\n");
     }
   }
   
   if (isMIP) {
-    if(trace) Rprintf("Rcplex: try setting MIP type\n");
+    //if(trace) Rprintf("Rcplex: try setting MIP type\n");
     status = CPXcopyctype(env, lp, vtype);
     if (status) {
       my_error(("Failed to copy vtype.\n"));
     }
-    if(trace) Rprintf("Rcplex: done setting MIP type\n");
+    //if(trace) Rprintf("Rcplex: done setting MIP type\n");
   }
   
   /* solve problem */
   if(isMIP) {
-    if(trace) Rprintf("Rcplex: try optimizing MIP type\n");
+    //if(trace) Rprintf("Rcplex: try optimizing MIP type\n");
     status = CPXmipopt(env, lp);
-    if(trace) Rprintf("Rcplex: done optimizing MIP type\n");
+    //if(trace) Rprintf("Rcplex: done optimizing MIP type\n");
     
     /*
      * solutions pool not supported for versions of cplex < 11
@@ -247,7 +244,7 @@ SEXP Rcplex_QCP(SEXP numcols_p,
   if (status) {
     my_error(("Failed to optimize problem."));
   }
-  if(trace) Rprintf("Rcplex: optimizer finished work.\n");
+  //if(trace) Rprintf("Rcplex: optimizer finished work.\n");
   PROTECT(solstat = allocVector(INTSXP,  1));
 
   /* retrieve status of optimization */

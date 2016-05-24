@@ -24,8 +24,8 @@ quadratic_constraint <- function( QC, dir, b ) {
   if( !length(QC$linnzcount) )
     QC$linnzcount <- rep(0L, len_Q)
 
-  if( any( QC$linnzcount > 0 ) )
-      stop( "linear terms in quadratic constraints not supported in Rcplex." )
+  ##  if( any( QC$linnzcount > 0 ) )
+  ##     stop( "linear terms in quadratic constraints not supported in Rcplex." )
 
   QC$quadnzcount <- as.integer(lapply(QC$Q, function(x) length(x$v)))
 
