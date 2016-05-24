@@ -190,16 +190,19 @@ SEXP Rcplex_QCP(SEXP numcols_p,
   }
   
   if (isMIP) {
+    if(trace) Rprintf("Rcplex: try setting MIP type\n");
     status = CPXcopyctype(env, lp, vtype);
     if (status) {
       my_error(("Failed to copy vtype.\n"));
     }
+    if(trace) Rprintf("Rcplex: done setting MIP type\n");
   }
-
+  
   /* solve problem */
   if(isMIP) {
-    
+    if(trace) Rprintf("Rcplex: try optimizing MIP type\n");
     status = CPXmipopt(env, lp);
+    if(trace) Rprintf("Rcplex: done optimizing MIP type\n");
     
     /*
      * solutions pool not supported for versions of cplex < 11
@@ -227,7 +230,7 @@ SEXP Rcplex_QCP(SEXP numcols_p,
       status = CPXpopulate(env, lp);
     }
     #endif
-  }
+  } 
   else if (isQCP) {
    status = CPXbaropt (env, lp); 
   }
@@ -244,7 +247,7 @@ SEXP Rcplex_QCP(SEXP numcols_p,
   if (status) {
     my_error(("Failed to optimize problem."));
   }
-  
+  if(trace) Rprintf("Rcplex: optimizer finished work.\n");
   PROTECT(solstat = allocVector(INTSXP,  1));
 
   /* retrieve status of optimization */

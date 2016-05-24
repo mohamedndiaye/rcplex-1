@@ -19,19 +19,21 @@ quadratic_constraint <- function( QC, dir, b ) {
                                      x } )
   ## FIXME: Currently only dense vectors as input supported
   QC$L <- lapply( QC$L, as.sparse_vector)
-  QC$linnzcount <- sapply( QC$L, function(x) {len <- length(x)
-                                         if(!len)
-                                           len <- 0L
-                                         as.integer(length(x))} )
+  QC$linnzcount <- sapply( QC$L, function(x) {
+                                         as.integer(length(x$v))} )
   if( !length(QC$linnzcount) )
     QC$linnzcount <- rep(0L, len_Q)
+
+  if( any( QC$linnzcount > 0 ) )
+      stop( "linear terms in quadratic constraints not supported in Rcplex." )
+
   QC$quadnzcount <- as.integer(lapply(QC$Q, function(x) length(x$v)))
 
   out <- list( QC,
                dir = as.character(dir),
                b = as.double(b)
                )
-  
+
   class(out) <- "quadratic_constraint"
   out
 }

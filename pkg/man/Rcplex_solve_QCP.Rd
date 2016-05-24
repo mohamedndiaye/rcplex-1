@@ -118,6 +118,9 @@ QC <- list(QC = list(Q = list(diag(1, nrow = 3)), L = list(c(3,4,-3))), dir = "L
 res <- Rcplex_solve_QCP(c,A, b, Q, ub = ub, QC = QC, sense = dir, objsense = "max")
 print(res)
 
+## solve MIQCP
+res <- Rcplex_solve_QCP(c,A, b, Q, ub = ub, QC = QC, sense = dir, objsense = "max", vtype = c("C", "I", "C"))
+
 Rcplex.close()
 }
 \keyword{optimize}
