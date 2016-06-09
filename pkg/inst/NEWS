@@ -1,3 +1,8 @@
+Changes in 0.3-3:
+
+  o New maintainer. QCP officially supported and exported. Tested with
+  the IBM ILOG CPLEX Community Edition 12.6.3.
+
 Changes in 0.3-0:
 
   o QCP support (not yet exported from NAMESPACE). Fixed configure

@@ -86,8 +86,8 @@ See function \code{link[Rcplex]{Rcplex}()} for more information about
     }
   }
 }
-\references{ILOG CPLEX User's Guide }
-\author{Hector Corrada Bravo and Stefan Theussl }
+\references{IBM ILOG CPLEX Optimization Studio documentation}
+\author{Hector Corrada Bravo and Stefan Theussl}
 \seealso{\code{\link{Rcplex.close}}, \code{\link{optim}}}
 \examples{
 ## objective function
@@ -112,7 +112,8 @@ res <- Rcplex_solve_QCP(c,A, b, Q, ub = ub, QC = QC, sense = dir, objsense = "ma
 print(res)
 
 ## solve MIQCP
-res <- Rcplex_solve_QCP(c,A, b, Q, ub = ub, QC = QC, sense = dir, objsense = "max", vtype = c("C", "I", "C"))
+res <- Rcplex_solve_QCP(c, A, b, Q, ub = ub, QC = QC,
+                        sense = dir, objsense = "max", vtype = c("C", "I", "C"))
 
 ## quadratic and linear part
 QC <- list(QC = list(Q = list(diag(1, nrow = 3)), L = list(c(3,4,-3))), dir = "L", b = 1)

@@ -152,8 +152,8 @@ Rcplex(cvec, Amat, bvec, Qmat = NULL,
     }
   }
 }
-\references{ILOG CPLEX User's Guide }
-\author{Hector Corrada Bravo and Stefan Theussl }
+\references{IBM ILOG CPLEX Optimization Studio documentation}
+\author{Hector Corrada Bravo and Stefan Theussl}
 \seealso{\code{\link{Rcplex.close}}, \code{\link{optim}}}
 \examples{
 ## A linear program (this is lpex1.c in the CPLEX examples)

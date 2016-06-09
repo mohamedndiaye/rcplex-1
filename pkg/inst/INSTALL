@@ -1,4 +1,4 @@
-Rcplex - R interface to the CPLEX optimization library
+Rcplex - R Interface to the IBM ILOG CPLEX optimization library
 
 Installation of the Rcplex package requires the following information:
 	1) the CPLEX include directory 
@@ -8,10 +8,13 @@ Installation of the Rcplex package requires the following information:
 	   the CPLEX callable library is located and other libraries
 	   CPLEX requires for proper linking
 
-As in regular usage of CPLEX, the environment variable
-ILOG_LICENSE_FILE must be set to the location of a file with a valid
-ILOG license key.
-
+The Community Edition of CPLEX offers all features but only allows to
+solve optimization problems containing 1000 variables and constraints
+at maximum. The package was tested using this flavor of CPLEX 12.6.3.
+Further steps have to be made prior using a different
+(non-free-to-use) flavor of CPLEX. Please consult the manual of CPLEX
+on setting it up properly (e.g., referencing the ILOG_LICENSE_FILE
+as an environment variable or connecting to a licence server).
 
 
 ***LINUX INSTALLATION***
@@ -84,26 +87,35 @@ Installation on Windows systems is done by using the provided
 Makevars.win file in the src directory. It contains the following
 lines:
 
-PKG_CPPFLAGS=-I<CPLEX_DIR>/include
-PKG_LIBS=-L<CPLEX_DIR>/lib/x86_windows_vs2008/stat_mda -lcplex111 -lm
+ifeq "$(WIN)" "64"
+PKG_LIBS = -L"${CPLEX_DIR}/bin/x64_win64" -lcplex1263 -lm
+PKG_CPPFLAGS = -D_LP64 -I"${CPLEX_DIR}/include"
+else
+PKG_LIBS = -L"${CPLEX_DIR}/bin/x86_win32" -lcplex1263 -lm
+PKG_CPPFLAGS = -I"${CPLEX_DIR}/include"
+endif
 
-where <cplex_dir> is the cplex installation directory
-e.g. /c/ilog/cplex111. Please edit your Makevars.win file accordingly.
+where ${CPLEX_DIR} references to the cplex installation directory and
+can be set in the Makevars.site configuration file for the given
+architecture in your R installation. If you are using a different
+version of CPLEX than 12.6.3 then please edit your Makevars.win file
+accordingly.
 
-We have successfully tested this procedure with CPLEX 11.1 on 32-bit
-Windows XP.
+We have successfully tested this procedure with the IBM ILOG CPLEX
+Community Edition 12.6.3 on 64-bit Windows 7. 32 bit is currently not
+supported. Please install the package using "R CMD INSTALL
+--no-multiarch Rcplex_0.3-3.tar.gz" on 64 bit systems.
+
 
 
 ***AIX***
 
-Installation in AIX was successful using IBM's XL C compiler and the
-following arguments to R CMD INSTALL:
+Installation in AIX on Power 6 (6.1.0) was successful with earlier
+version of CPLEX (11.2) using IBM's XL C compiler and the following
+arguments to R CMD INSTALL:
 
 R CMD INSTALL Rcplex_0.3-0 \
 --configure-args="--with-cplex-include=<cplex_dir>/include \
 --with-cplex-cflags=\"-q64\" \
 --with-cplex-lib=\"-L<cplex_dir>/lib/power64_aix5.2_7.0/static_mt_stl \
 -lcplex -lm -lpthread -q64\""
-
-This was successfully tested with CPLEX 11.2 for AIX (6.1.0) on Power
-systems (Power 6).

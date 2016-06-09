@@ -1,2 +1,7 @@
-PKG_CPPFLAGS=-I/c/ilog/cplex111/include
-PKG_LIBS=-L/c/ilog/cplex111/lib/x86_windows_vs2008/stat_mda -lcplex111 -lm
+ifeq "$(WIN)" "64"
+PKG_LIBS = -L"${CPLEX_DIR}/bin/x64_win64" -lcplex1263 -lm
+PKG_CPPFLAGS = -D_LP64 -I"${CPLEX_DIR}/include"
+else
+PKG_LIBS = -L"${CPLEX_DIR}/bin/x86_win32" -lcplex1263 -lm
+PKG_CPPFLAGS = -I"${CPLEX_DIR}/include"
+endif
